@@ -1,23 +1,22 @@
-# Create initial access code for first user
-access_code = InviteCode.find_or_create_by!(code: "FIRSTUSER") do |ic|
-  ic.max_uses = 1
-end
-puts "Initial access code: #{access_code.code}"
-
 # Create admin user if none exists
-admin = User.find_by(email_address: "brad@schoolai.com")
-if admin.nil?
-  admin = User.create!(
-    name: "Brad",
-    email_address: "brad@schoolai.com",
-    password: "changeme123",
-    admin: true
-  )
+admin = User.find_or_create_by!(email_address: "brad@schoolai.com") do |u|
+  u.name = "Brad"
+  u.password = "changeme123"
+  u.admin = true
+  u.onboarding_completed = true
+end
+
+if admin.previously_new_record?
   puts "Admin user created: #{admin.email_address} (change password after first login!)"
-  access_code.use!
 else
   puts "Admin user already exists: #{admin.email_address}"
 end
+
+# Create invite code for friends
+invite_code = InviteCode.find_or_create_by!(code: "FULLSEND2026") do |ic|
+  ic.max_uses = 20
+end
+puts "Invite code for friends: #{invite_code.code}"
 
 # Sync F1 data
 puts "Syncing F1 data for #{Time.current.year}..."
@@ -62,8 +61,3 @@ def add_missing_2026_drivers
   Driver.where(external_id: ["perez", "arvid_lindblad"]).destroy_all
 end
 
-# Create additional access codes for testing
-5.times do
-  code = InviteCode.create!(max_uses: 1)
-  puts "Created access code: #{code.code}"
-end
