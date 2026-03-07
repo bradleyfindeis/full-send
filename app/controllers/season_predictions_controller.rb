@@ -31,7 +31,8 @@ class SeasonPredictionsController < ApplicationController
     @prediction.assign_attributes(season_prediction_params)
 
     if @prediction.save
-      redirect_to season_prediction_path, notice: "Season predictions saved! They will lock when you make your first race prediction."
+      @prediction.lock! if @prediction.complete?
+      redirect_to season_prediction_path, notice: "Season predictions locked in!"
     else
       @drivers = Driver.active.ordered
       @teams = Team.order(:name)
