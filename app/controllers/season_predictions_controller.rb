@@ -11,12 +11,14 @@ class SeasonPredictionsController < ApplicationController
   def new
     @season = Season.current_season
     @prediction = current_user.season_predictions.find_or_initialize_by(season: @season)
+
+    if @prediction.persisted? && @prediction.locked?
+      redirect_to season_prediction_path, notice: "Your season predictions are already locked."
+      return
+    end
+
     @drivers = Driver.active.ordered
     @teams = Team.order(:name)
-
-    if @prediction.locked?
-      redirect_to season_prediction_path, notice: "Your season predictions are already locked."
-    end
   end
 
   def create
