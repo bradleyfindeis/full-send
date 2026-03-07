@@ -1,0 +1,56 @@
+<%# locals: (name:, drivers:, selected_id: nil, placeholder: "Select driver...") %>
+<div data-controller="driver-select" class="relative">
+  <select name="<%= name %>" data-driver-select-target="select" class="hidden">
+    <option value=""><%= placeholder %></option>
+    <% drivers.includes(:team).order(:name).each do |driver| %>
+      <% color = team_color(driver.team&.external_id) %>
+      <option value="<%= driver.id %>" 
+              <%= 'selected' if driver.id == selected_id %>
+              data-team-color="<%= color %>"
+              data-team-name="<%= driver.team&.name %>">
+        <%= driver.name %>
+      </option>
+    <% end %>
+  </select>
+
+  <button type="button"
+          data-action="click->driver-select#toggle"
+          class="w-full px-4 py-3 bg-neutral-800 border border-neutral-700 rounded-lg text-left focus:outline-none focus:ring-2 focus:ring-red-600 focus:border-transparent flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <span data-driver-select-target="color" 
+            class="w-3 h-3 rounded-full hidden"></span>
+      <span data-driver-select-target="display" class="text-neutral-400"><%= placeholder %></span>
+    </div>
+    <svg class="w-4 h-4 text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+    </svg>
+  </button>
+
+  <div data-driver-select-target="menu" 
+       class="hidden absolute z-50 mt-1 w-full bg-neutral-800 border border-neutral-700 rounded-lg shadow-xl max-h-64 overflow-hidden">
+    <div class="p-2 border-b border-neutral-700">
+      <input type="text"
+             data-driver-select-target="search"
+             data-action="input->driver-select#filterDrivers"
+             placeholder="Search drivers..."
+             class="w-full px-3 py-2 bg-neutral-900 border border-neutral-600 rounded text-white text-sm focus:outline-none focus:ring-1 focus:ring-red-600">
+    </div>
+    <div class="overflow-y-auto max-h-48">
+      <% drivers.includes(:team).order("teams.name", :name).each do |driver| %>
+        <% color = team_color(driver.team&.external_id) %>
+        <button type="button"
+                data-action="click->driver-select#selectDriver"
+                data-driver-option
+                data-id="<%= driver.id %>"
+                data-name="<%= driver.name %>"
+                data-color="<%= color %>"
+                data-team="<%= driver.team&.name %>"
+                class="w-full px-3 py-2 text-left hover:bg-neutral-700 flex items-center gap-3 text-sm">
+          <span class="w-3 h-3 rounded-full flex-shrink-0" style="background-color: <%= color %>"></span>
+          <span class="text-white"><%= driver.name %></span>
+          <span class="text-neutral-500 text-xs ml-auto"><%= driver.team&.name || 'TBA' %></span>
+        </button>
+      <% end %>
+    </div>
+  </div>
+</div>

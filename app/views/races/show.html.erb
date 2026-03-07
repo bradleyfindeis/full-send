@@ -1,0 +1,136 @@
+<div class="min-h-screen bg-neutral-950">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="mb-8">
+      <%= link_to races_path, class: "inline-flex items-center text-neutral-400 hover:text-white transition-colors mb-4" do %>
+        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+        </svg>
+        Back to Races
+      <% end %>
+
+      <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+        <div>
+          <div class="flex items-center gap-3 mb-2">
+            <span class="px-3 py-1 bg-theme-20 text-theme-light text-sm font-medium rounded-full">Round <%= @race.round %></span>
+            <% if @race.has_sprint? %>
+              <span class="px-3 py-1 bg-purple-600/20 text-purple-400 text-sm font-medium rounded-full">Sprint Weekend</span>
+            <% end %>
+          </div>
+          <h1 class="text-3xl font-bold text-white"><%= @race.name %></h1>
+          <p class="text-neutral-400 mt-1">
+            <svg class="inline w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+            </svg>
+            <%= @race.circuit_name %>, <%= @race.circuit_country %>
+          </p>
+        </div>
+
+        <% unless @race.race_locked? %>
+          <%= link_to "Make Predictions", new_race_prediction_path(@race), class: "px-6 py-3 btn-primary font-semibold rounded-lg transition-colors" %>
+        <% end %>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+      <div class="bg-neutral-900 border border-neutral-800 rounded-xl p-6">
+        <h3 class="text-neutral-400 text-sm font-medium mb-2">Qualifying</h3>
+        <p class="text-white font-medium"><%= local_time(@race.quali_date, format: :day_time) || "TBD" %></p>
+        <p class="text-xs text-neutral-500"><%= timezone_abbrev %></p>
+        <p class="text-xs <%= @race.quali_locked? ? 'text-red-400' : 'text-green-400' %> mt-1">
+          <%= @race.quali_locked? ? "Locked" : "Open for predictions" %>
+        </p>
+      </div>
+
+      <% if @race.has_sprint? %>
+        <div class="bg-neutral-900 border border-neutral-800 rounded-xl p-6">
+          <h3 class="text-neutral-400 text-sm font-medium mb-2">Sprint</h3>
+          <p class="text-white font-medium"><%= local_time(@race.sprint_date, format: :day_time) || "TBD" %></p>
+          <p class="text-xs text-neutral-500"><%= timezone_abbrev %></p>
+          <p class="text-xs <%= @race.sprint_locked? ? 'text-red-400' : 'text-green-400' %> mt-1">
+            <%= @race.sprint_locked? ? "Locked" : "Open for predictions" %>
+          </p>
+        </div>
+      <% end %>
+
+      <div class="bg-neutral-900 border border-neutral-800 rounded-xl p-6">
+        <h3 class="text-neutral-400 text-sm font-medium mb-2">Race</h3>
+        <p class="text-white font-medium"><%= local_time(@race.race_date, format: :day_time) || "TBD" %></p>
+        <p class="text-xs text-neutral-500"><%= timezone_abbrev %></p>
+        <p class="text-xs <%= @race.race_locked? ? 'text-red-400' : 'text-green-400' %> mt-1">
+          <%= @race.race_locked? ? "Locked" : "Open for predictions" %>
+        </p>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <% if @user_predictions.any? %>
+        <div class="bg-neutral-900 border border-neutral-800 rounded-xl p-6">
+          <h2 class="text-lg font-semibold text-white mb-4">Your Predictions</h2>
+          <div class="space-y-4">
+            <% %w[qualifying sprint race].each do |session| %>
+              <% session_predictions = @user_predictions.select { |p| p.session_type == session } %>
+              <% next if session_predictions.empty? %>
+
+              <div>
+                <h3 class="text-neutral-400 text-sm font-medium mb-2 capitalize"><%= session %></h3>
+                <div class="space-y-2">
+                  <% session_predictions.sort_by { |p| p.position || 999 }.each do |prediction| %>
+                    <div class="flex items-center justify-between p-3 bg-neutral-800/50 rounded-lg">
+                      <div class="flex items-center gap-3">
+                        <% if prediction.prediction_type == "position" %>
+                          <span class="w-8 h-8 flex items-center justify-center rounded-full <%= prediction.position == 1 ? 'bg-yellow-500 text-black' : prediction.position == 2 ? 'bg-neutral-400 text-black' : 'bg-amber-600 text-black' %> text-sm font-bold">
+                            P<%= prediction.position %>
+                          </span>
+                        <% else %>
+                          <span class="w-8 h-8 flex items-center justify-center rounded-full bg-purple-600 text-white text-xs font-bold">FL</span>
+                        <% end %>
+                        <span class="text-white"><%= prediction.driver.name %></span>
+                      </div>
+                      <% if prediction.points_earned > 0 %>
+                        <span class="text-green-400 font-mono font-semibold">+<%= prediction.points_earned %></span>
+                      <% elsif prediction.locked? && @race.race_results.any? %>
+                        <span class="text-neutral-500">0</span>
+                      <% end %>
+                    </div>
+                  <% end %>
+                </div>
+              </div>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+
+      <% if @results.any? %>
+        <div class="bg-neutral-900 border border-neutral-800 rounded-xl p-6">
+          <h2 class="text-lg font-semibold text-white mb-4">Results</h2>
+          <div class="space-y-4">
+            <% %w[qualifying sprint race].each do |session| %>
+              <% session_results = @results.select { |r| r.session_type == session }.first(3) %>
+              <% next if session_results.empty? %>
+
+              <div>
+                <h3 class="text-neutral-400 text-sm font-medium mb-2 capitalize"><%= session %></h3>
+                <div class="space-y-2">
+                  <% session_results.each do |result| %>
+                    <div class="flex items-center justify-between p-3 bg-neutral-800/50 rounded-lg">
+                      <div class="flex items-center gap-3">
+                        <span class="w-8 h-8 flex items-center justify-center rounded-full <%= result.position == 1 ? 'bg-yellow-500 text-black' : result.position == 2 ? 'bg-neutral-400 text-black' : 'bg-amber-600 text-black' %> text-sm font-bold">
+                          P<%= result.position %>
+                        </span>
+                        <span class="text-white"><%= result.driver.name %></span>
+                        <% if result.fastest_lap? %>
+                          <span class="px-2 py-0.5 bg-purple-600/20 text-purple-400 text-xs rounded-full">Fastest Lap</span>
+                        <% end %>
+                      </div>
+                    </div>
+                  <% end %>
+                </div>
+              </div>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>

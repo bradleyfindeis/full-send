@@ -1,0 +1,20 @@
+class SettingsController < ApplicationController
+  def edit
+    @user = current_user
+  end
+
+  def update
+    @user = current_user
+    if @user.update(settings_params)
+      redirect_to settings_path, notice: "Settings updated successfully."
+    else
+      render :edit, status: :unprocessable_entity
+    end
+  end
+
+  private
+
+  def settings_params
+    params.require(:user).permit(:email_reminders, :timezone, :time_format, :theme)
+  end
+end

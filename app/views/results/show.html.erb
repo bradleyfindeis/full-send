@@ -1,0 +1,169 @@
+<div class="min-h-screen bg-neutral-950">
+  <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="mb-8">
+      <%= link_to results_path, class: "inline-flex items-center text-neutral-400 hover:text-white transition-colors mb-4" do %>
+        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+        </svg>
+        Back to Results
+      <% end %>
+
+      <h1 class="text-2xl font-bold text-white"><%= @race.name %></h1>
+      <p class="text-neutral-400 mt-1">
+        Round <%= @race.round %> &bull; <%= @race.circuit_name %>, <%= @race.circuit_country %>
+        <% if @race.race_date %>
+          &bull; <%= local_time(@race.race_date, format: :date_only) %>
+        <% end %>
+      </p>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <!-- Race Results -->
+      <div class="bg-neutral-900 border border-neutral-800 rounded-xl overflow-hidden">
+        <div class="px-6 py-4 border-b border-neutral-800 flex items-center gap-3">
+          <div class="w-2 h-2 bg-green-500 rounded-full"></div>
+          <h2 class="text-lg font-semibold text-white">Race</h2>
+        </div>
+        
+        <% if @race_results.any? %>
+          <div class="divide-y divide-neutral-800">
+            <% @race_results.each do |result| %>
+              <div class="flex items-center gap-4 px-6 py-3 <%= result.podium? ? 'bg-neutral-800/30' : '' %>">
+                <div class="w-10 text-center">
+                  <% if result.position == 1 %>
+                    <span class="text-2xl">🥇</span>
+                  <% elsif result.position == 2 %>
+                    <span class="text-2xl">🥈</span>
+                  <% elsif result.position == 3 %>
+                    <span class="text-2xl">🥉</span>
+                  <% else %>
+                    <span class="text-neutral-400 font-mono text-lg">P<%= result.position %></span>
+                  <% end %>
+                </div>
+                <div class="w-1 h-8 rounded-full" style="background-color: <%= result.driver.team&.color || '#6B7280' %>"></div>
+                <div class="flex-1 min-w-0">
+                  <p class="text-white font-medium truncate">
+                    <%= result.driver.name %>
+                    <% if result.fastest_lap? %>
+                      <span class="ml-2 text-purple-400 text-xs font-semibold">⏱ FL</span>
+                    <% end %>
+                  </p>
+                  <p class="text-neutral-500 text-xs truncate"><%= result.driver.team&.name %></p>
+                </div>
+                <div class="text-neutral-400 font-mono text-sm">
+                  <%= result.driver.code || result.driver.short_name %>
+                </div>
+              </div>
+            <% end %>
+          </div>
+        <% else %>
+          <div class="px-6 py-12 text-center">
+            <p class="text-neutral-400">Race results not yet available.</p>
+          </div>
+        <% end %>
+      </div>
+
+      <!-- Qualifying Results -->
+      <div class="bg-neutral-900 border border-neutral-800 rounded-xl overflow-hidden">
+        <div class="px-6 py-4 border-b border-neutral-800 flex items-center gap-3">
+          <div class="w-2 h-2 bg-yellow-500 rounded-full"></div>
+          <h2 class="text-lg font-semibold text-white">Qualifying</h2>
+        </div>
+        
+        <% if @qualifying_results.any? %>
+          <div class="divide-y divide-neutral-800">
+            <% @qualifying_results.each do |result| %>
+              <div class="flex items-center gap-4 px-6 py-3 <%= result.podium? ? 'bg-neutral-800/30' : '' %>">
+                <div class="w-10 text-center">
+                  <% if result.position == 1 %>
+                    <span class="text-red-500 font-bold text-lg">P1</span>
+                  <% elsif result.position <= 3 %>
+                    <span class="text-white font-semibold">P<%= result.position %></span>
+                  <% else %>
+                    <span class="text-neutral-400 font-mono">P<%= result.position %></span>
+                  <% end %>
+                </div>
+                <div class="w-1 h-8 rounded-full" style="background-color: <%= result.driver.team&.color || '#6B7280' %>"></div>
+                <div class="flex-1 min-w-0">
+                  <p class="text-white font-medium truncate"><%= result.driver.name %></p>
+                  <p class="text-neutral-500 text-xs truncate"><%= result.driver.team&.name %></p>
+                </div>
+                <div class="text-neutral-400 font-mono text-sm">
+                  <%= result.driver.code || result.driver.short_name %>
+                </div>
+              </div>
+            <% end %>
+          </div>
+        <% else %>
+          <div class="px-6 py-12 text-center">
+            <p class="text-neutral-400">Qualifying results not yet available.</p>
+          </div>
+        <% end %>
+      </div>
+
+      <% if @race.has_sprint? %>
+        <!-- Sprint Results -->
+        <div class="bg-neutral-900 border border-neutral-800 rounded-xl overflow-hidden lg:col-span-2">
+          <div class="px-6 py-4 border-b border-neutral-800 flex items-center gap-3">
+            <div class="w-2 h-2 bg-orange-500 rounded-full"></div>
+            <h2 class="text-lg font-semibold text-white">Sprint</h2>
+          </div>
+          
+          <% if @sprint_results&.any? %>
+            <div class="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-neutral-800">
+              <div class="divide-y divide-neutral-800">
+                <% @sprint_results.first(10).each do |result| %>
+                  <div class="flex items-center gap-4 px-6 py-3 <%= result.podium? ? 'bg-neutral-800/30' : '' %>">
+                    <div class="w-10 text-center">
+                      <% if result.position == 1 %>
+                        <span class="text-orange-500 font-bold text-lg">P1</span>
+                      <% elsif result.position <= 3 %>
+                        <span class="text-white font-semibold">P<%= result.position %></span>
+                      <% else %>
+                        <span class="text-neutral-400 font-mono">P<%= result.position %></span>
+                      <% end %>
+                    </div>
+                    <div class="w-1 h-8 rounded-full" style="background-color: <%= result.driver.team&.color || '#6B7280' %>"></div>
+                    <div class="flex-1 min-w-0">
+                      <p class="text-white font-medium truncate"><%= result.driver.name %></p>
+                    </div>
+                    <div class="text-neutral-400 font-mono text-sm">
+                      <%= result.driver.code || result.driver.short_name %>
+                    </div>
+                  </div>
+                <% end %>
+              </div>
+              <div class="divide-y divide-neutral-800">
+                <% @sprint_results.drop(10).each do |result| %>
+                  <div class="flex items-center gap-4 px-6 py-3">
+                    <div class="w-10 text-center">
+                      <span class="text-neutral-400 font-mono">P<%= result.position %></span>
+                    </div>
+                    <div class="w-1 h-8 rounded-full" style="background-color: <%= result.driver.team&.color || '#6B7280' %>"></div>
+                    <div class="flex-1 min-w-0">
+                      <p class="text-white font-medium truncate"><%= result.driver.name %></p>
+                    </div>
+                    <div class="text-neutral-400 font-mono text-sm">
+                      <%= result.driver.code || result.driver.short_name %>
+                    </div>
+                  </div>
+                <% end %>
+              </div>
+            </div>
+          <% else %>
+            <div class="px-6 py-12 text-center">
+              <p class="text-neutral-400">Sprint results not yet available.</p>
+            </div>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+
+    <!-- Link to predictions -->
+    <div class="mt-8 text-center">
+      <%= link_to race_path(@race), class: "text-red-500 hover:text-red-400 text-sm" do %>
+        View predictions for this race →
+      <% end %>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,90 @@
+<div class="min-h-screen bg-neutral-950">
+  <div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="text-center mb-8">
+      <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-theme-20 mb-4">
+        <svg class="w-8 h-8 text-theme" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/>
+        </svg>
+      </div>
+      <h1 class="text-2xl font-bold text-white">Season Champion Predictions</h1>
+      <p class="text-neutral-400 mt-2"><%= @season&.year %> Season</p>
+    </div>
+
+    <div class="bg-gradient-to-br from-neutral-900 to-neutral-800 border border-neutral-700 rounded-xl p-6 mb-8">
+      <div class="flex items-start gap-4">
+        <div class="flex-shrink-0">
+          <svg class="w-6 h-6 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+        </div>
+        <div>
+          <p class="text-white font-medium">Worth 100 Points!</p>
+          <p class="text-neutral-400 text-sm mt-1">
+            Pick wisely - you get <span class="text-white">50 points</span> for correctly predicting the Drivers Champion
+            and <span class="text-white">50 points</span> for the Constructors Champion.
+          </p>
+          <p class="text-neutral-500 text-sm mt-2">
+            Your picks will lock when you make your first race prediction.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <%= form_with model: @prediction, url: season_prediction_path, method: :post, class: "space-y-6" do |form| %>
+      <% if @prediction.errors.any? %>
+        <div class="bg-red-900/50 border border-red-500 rounded-lg p-4">
+          <ul class="text-red-200 text-sm space-y-1">
+            <% @prediction.errors.full_messages.each do |message| %>
+              <li><%= message %></li>
+            <% end %>
+          </ul>
+        </div>
+      <% end %>
+
+      <div class="bg-neutral-900 border border-neutral-800 rounded-xl p-6">
+        <div class="flex items-center gap-3 mb-4">
+          <div class="w-10 h-10 bg-yellow-500/20 rounded-full flex items-center justify-center">
+            <svg class="w-5 h-5 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+            </svg>
+          </div>
+          <div>
+            <h2 class="text-lg font-semibold text-white">Drivers Champion</h2>
+            <p class="text-neutral-400 text-sm">50 points if correct</p>
+          </div>
+        </div>
+
+        <%= render "shared/driver_select", 
+            name: "season_prediction[drivers_champion_id]",
+            drivers: @drivers,
+            selected_id: @prediction.drivers_champion_id,
+            placeholder: "Select a driver..." %>
+      </div>
+
+      <div class="bg-neutral-900 border border-neutral-800 rounded-xl p-6">
+        <div class="flex items-center gap-3 mb-4">
+          <div class="w-10 h-10 bg-blue-500/20 rounded-full flex items-center justify-center">
+            <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+            </svg>
+          </div>
+          <div>
+            <h2 class="text-lg font-semibold text-white">Constructors Champion</h2>
+            <p class="text-neutral-400 text-sm">50 points if correct</p>
+          </div>
+        </div>
+
+        <%= render "shared/team_select", 
+            name: "season_prediction[constructors_champion_id]",
+            teams: @teams,
+            selected_id: @prediction.constructors_champion_id,
+            placeholder: "Select a team..." %>
+      </div>
+
+      <div class="flex justify-end gap-4">
+        <%= link_to "Skip for Now", root_path, class: "px-6 py-3 text-neutral-400 hover:text-white font-medium transition-colors" %>
+        <%= form.submit "Save Predictions", class: "px-6 py-3 btn-primary font-semibold rounded-lg transition-colors cursor-pointer" %>
+      </div>
+    <% end %>
+  </div>
+</div>

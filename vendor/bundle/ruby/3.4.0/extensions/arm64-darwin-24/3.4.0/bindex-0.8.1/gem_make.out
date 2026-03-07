@@ -1,0 +1,18 @@
+current directory: /Users/bradleyfindeis/Documents/projects/schoolai-f1/vendor/bundle/ruby/3.4.0/gems/bindex-0.8.1/ext/skiptrace
+/Users/bradleyfindeis/.rbenv/versions/3.4.6/bin/ruby extconf.rb
+creating Makefile
+
+current directory: /Users/bradleyfindeis/Documents/projects/schoolai-f1/vendor/bundle/ruby/3.4.0/gems/bindex-0.8.1/ext/skiptrace
+make DESTDIR\= sitearchdir\=./.gem.20260306-22297-4dcupk sitelibdir\=./.gem.20260306-22297-4dcupk clean
+
+current directory: /Users/bradleyfindeis/Documents/projects/schoolai-f1/vendor/bundle/ruby/3.4.0/gems/bindex-0.8.1/ext/skiptrace
+make DESTDIR\= sitearchdir\=./.gem.20260306-22297-4dcupk sitelibdir\=./.gem.20260306-22297-4dcupk
+compiling cruby.c
+linking shared-object skiptrace/internal/cruby.bundle
+
+current directory: /Users/bradleyfindeis/Documents/projects/schoolai-f1/vendor/bundle/ruby/3.4.0/gems/bindex-0.8.1/ext/skiptrace
+make DESTDIR\= sitearchdir\=./.gem.20260306-22297-4dcupk sitelibdir\=./.gem.20260306-22297-4dcupk install
+/opt/homebrew/bin/ginstall -c -m 0755 cruby.bundle ./.gem.20260306-22297-4dcupk/skiptrace/internal
+
+current directory: /Users/bradleyfindeis/Documents/projects/schoolai-f1/vendor/bundle/ruby/3.4.0/gems/bindex-0.8.1/ext/skiptrace
+make DESTDIR\= sitearchdir\=./.gem.20260306-22297-4dcupk sitelibdir\=./.gem.20260306-22297-4dcupk clean

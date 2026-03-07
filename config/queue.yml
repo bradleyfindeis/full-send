@@ -1,0 +1,25 @@
+default: &default
+  dispatchers:
+    - polling_interval: 1
+      batch_size: 500
+      recurring_tasks:
+        send_prediction_reminders:
+          class: SendPredictionRemindersJob
+          schedule: every hour
+        post_race_results_to_slack:
+          class: PostRaceResultsToSlackJob
+          schedule: every hour
+  workers:
+    - queues: "*"
+      threads: 3
+      processes: <%= ENV.fetch("JOB_CONCURRENCY", 1) %>
+      polling_interval: 0.1
+
+development:
+  <<: *default
+
+test:
+  <<: *default
+
+production:
+  <<: *default

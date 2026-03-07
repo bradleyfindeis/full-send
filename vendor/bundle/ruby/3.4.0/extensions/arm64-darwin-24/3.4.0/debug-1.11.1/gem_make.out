@@ -1,0 +1,19 @@
+current directory: /Users/bradleyfindeis/Documents/projects/schoolai-f1/vendor/bundle/ruby/3.4.0/gems/debug-1.11.1/ext/debug
+/Users/bradleyfindeis/.rbenv/versions/3.4.6/bin/ruby extconf.rb
+creating Makefile
+
+current directory: /Users/bradleyfindeis/Documents/projects/schoolai-f1/vendor/bundle/ruby/3.4.0/gems/debug-1.11.1/ext/debug
+make DESTDIR\= sitearchdir\=./.gem.20260306-22297-qrsute sitelibdir\=./.gem.20260306-22297-qrsute clean
+
+current directory: /Users/bradleyfindeis/Documents/projects/schoolai-f1/vendor/bundle/ruby/3.4.0/gems/debug-1.11.1/ext/debug
+make DESTDIR\= sitearchdir\=./.gem.20260306-22297-qrsute sitelibdir\=./.gem.20260306-22297-qrsute
+compiling debug.c
+compiling iseq_collector.c
+linking shared-object debug/debug.bundle
+
+current directory: /Users/bradleyfindeis/Documents/projects/schoolai-f1/vendor/bundle/ruby/3.4.0/gems/debug-1.11.1/ext/debug
+make DESTDIR\= sitearchdir\=./.gem.20260306-22297-qrsute sitelibdir\=./.gem.20260306-22297-qrsute install
+/opt/homebrew/bin/ginstall -c -m 0755 debug.bundle ./.gem.20260306-22297-qrsute/debug
+
+current directory: /Users/bradleyfindeis/Documents/projects/schoolai-f1/vendor/bundle/ruby/3.4.0/gems/debug-1.11.1/ext/debug
+make DESTDIR\= sitearchdir\=./.gem.20260306-22297-qrsute sitelibdir\=./.gem.20260306-22297-qrsute clean

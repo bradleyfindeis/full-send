@@ -1,0 +1,30 @@
+Hey <%= @user.name.split.first %>,
+
+<% case @urgency %>
+<% when :day_before_quali %>
+Qualifying for this weekend's race is TOMORROW! Don't miss your chance to lock in your predictions.
+<% when :day_of_quali %>
+Qualifying starts TODAY! Your qualifying predictions will lock when the session begins.
+<% when :day_of_race %>
+The race is TODAY! This is your final chance to make your podium and fastest lap predictions before they lock.
+<% end %>
+
+ROUND <%= @race.round %>: <%= @race.name.upcase %>
+<%= @race.circuit_name %>, <%= @race.circuit_country %>
+<% if @urgency == :day_of_race && @race.race_date %>
+Race starts: <%= format_time_for_user(@race.race_date, @user_timezone) %>
+<% elsif @race.quali_date %>
+Qualifying: <%= format_time_for_user(@race.quali_date, @user_timezone) %>
+<% end %>
+<% if @race.has_sprint? %>
+Sprint Weekend
+<% end %>
+
+Make your predictions now: <%= @predictions_url %>
+
+Good luck! Remember, every correct prediction earns you points on the leaderboard.
+
+---
+You're receiving this email because you have an account on Full Send and haven't made predictions for this race yet.
+
+Manage email preferences: <%= edit_settings_url %>

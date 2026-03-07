@@ -1,0 +1,44 @@
+databases:
+  - name: full-send-db
+    plan: free
+    databaseName: full_send_production
+    user: full_send
+
+services:
+  - type: web
+    name: full-send
+    runtime: docker
+    plan: free
+    healthCheckPath: /up
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: full-send-db
+          property: connectionString
+      - key: RAILS_MASTER_KEY
+        sync: false
+      - key: SLACK_WEBHOOK_URL
+        sync: false
+      - key: SLACK_CHANNEL
+        value: "#f1-predictions"
+      - key: RAILS_LOG_LEVEL
+        value: info
+      - key: RAILS_SERVE_STATIC_FILES
+        value: "true"
+
+  - type: worker
+    name: full-send-worker
+    runtime: docker
+    plan: free
+    dockerCommand: bundle exec rails solid_queue:start
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: full-send-db
+          property: connectionString
+      - key: RAILS_MASTER_KEY
+        sync: false
+      - key: SLACK_WEBHOOK_URL
+        sync: false
+      - key: SLACK_CHANNEL
+        value: "#f1-predictions"

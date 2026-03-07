@@ -1,0 +1,68 @@
+<div class="min-h-screen bg-neutral-950 flex items-center justify-center px-4">
+  <div class="max-w-lg w-full">
+    <div class="text-center mb-8">
+      <div class="inline-flex items-center justify-center w-16 h-16 bg-red-600 rounded-xl mb-4">
+        <span class="text-white font-black text-2xl italic transform -skew-x-12">FS</span>
+      </div>
+      <h1 class="text-3xl font-bold text-white">Welcome to Full Send!</h1>
+      <p class="text-neutral-400 mt-2">Let's personalize your experience, <%= @user.name.split.first %></p>
+    </div>
+
+    <%= form_with model: @user, url: onboarding_path, method: :patch, class: "space-y-6" do |form| %>
+      <div class="bg-neutral-900 border border-neutral-800 rounded-xl p-6">
+        <h2 class="text-lg font-semibold text-white mb-4">Choose Your Livery</h2>
+        <p class="text-neutral-400 text-sm mb-4">Pick your favorite team to customize the app colors.</p>
+        
+        <div class="grid grid-cols-2 sm:grid-cols-3 gap-3" data-controller="livery-select">
+          <% ApplicationHelper::THEME_OPTIONS.each do |label, value| %>
+            <% is_selected = (@user.theme || 'default') == value %>
+            <label class="relative cursor-pointer" data-livery-select-target="option" data-selected="<%= is_selected %>">
+              <%= form.radio_button :theme, value, class: "peer sr-only", data: { action: "change->livery-select#select" } %>
+              <div class="livery-card flex items-center gap-2 p-3 rounded-lg border-2 transition-colors <%= is_selected ? 'border-white bg-neutral-700' : 'border-neutral-700 bg-neutral-800 hover:bg-neutral-700' %>">
+                <div class="w-4 h-4 rounded-full flex-shrink-0" style="background-color: <%= ApplicationHelper::THEME_COLORS[value][:primary] %>"></div>
+                <span class="text-sm text-white truncate"><%= label %></span>
+                <svg class="livery-check w-4 h-4 ml-auto text-white flex-shrink-0 <%= is_selected ? '' : 'hidden' %>" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                </svg>
+              </div>
+            </label>
+          <% end %>
+        </div>
+      </div>
+
+      <div class="bg-neutral-900 border border-neutral-800 rounded-xl p-6">
+        <h2 class="text-lg font-semibold text-white mb-4">Time Preferences</h2>
+        
+        <div class="space-y-4">
+          <div>
+            <label class="block text-neutral-400 text-sm mb-2">Your Timezone</label>
+            <%= form.select :timezone, 
+                ApplicationHelper::TIMEZONE_OPTIONS,
+                {},
+                class: "w-full bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent" %>
+          </div>
+          
+          <div>
+            <label class="block text-neutral-400 text-sm mb-2">Time Format</label>
+            <div class="flex gap-4">
+              <% ApplicationHelper::TIME_FORMAT_OPTIONS.each do |label, value| %>
+                <label class="flex items-center gap-2 cursor-pointer">
+                  <%= form.radio_button :time_format, value, class: "w-4 h-4 text-red-600 bg-neutral-800 border-neutral-600 focus:ring-red-500", checked: (@user.time_format || '24h') == value %>
+                  <span class="text-white text-sm"><%= label %></span>
+                </label>
+              <% end %>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="pt-2">
+        <%= form.submit "Let's Go!", class: "w-full px-6 py-4 btn-primary text-lg font-semibold rounded-xl transition-colors cursor-pointer" %>
+      </div>
+
+      <p class="text-center text-neutral-500 text-sm">
+        You can change these anytime in Settings
+      </p>
+    <% end %>
+  </div>
+</div>

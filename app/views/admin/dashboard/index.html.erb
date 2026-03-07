@@ -1,0 +1,161 @@
+<div class="min-h-screen bg-neutral-950">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="mb-8">
+      <h1 class="text-2xl font-bold text-white">Admin Dashboard</h1>
+      <p class="text-neutral-400 mt-1">Manage your Full Send app</p>
+    </div>
+
+    <% if flash[:notice] %>
+      <div class="bg-green-900/50 border border-green-500 rounded-lg p-4 mb-6">
+        <p class="text-green-200"><%= flash[:notice] %></p>
+      </div>
+    <% end %>
+
+    <% if flash[:alert] %>
+      <div class="bg-red-900/50 border border-red-500 rounded-lg p-4 mb-6">
+        <p class="text-red-200"><%= flash[:alert] %></p>
+      </div>
+    <% end %>
+
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+      <div class="bg-neutral-900 border border-neutral-800 rounded-xl p-6">
+        <p class="text-neutral-400 text-sm">Users</p>
+        <p class="text-3xl font-bold text-white mt-1"><%= @users_count %></p>
+      </div>
+      <div class="bg-neutral-900 border border-neutral-800 rounded-xl p-6">
+        <p class="text-neutral-400 text-sm">Predictions</p>
+        <p class="text-3xl font-bold text-white mt-1"><%= @predictions_count %></p>
+      </div>
+      <div class="bg-neutral-900 border border-neutral-800 rounded-xl p-6">
+        <p class="text-neutral-400 text-sm">Races</p>
+        <p class="text-3xl font-bold text-white mt-1"><%= @races_count %></p>
+      </div>
+      <div class="bg-neutral-900 border border-neutral-800 rounded-xl p-6">
+        <p class="text-neutral-400 text-sm">Drivers</p>
+        <p class="text-3xl font-bold text-white mt-1"><%= @drivers_count %></p>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div class="bg-neutral-900 border border-neutral-800 rounded-xl p-6">
+        <h2 class="text-lg font-semibold text-white mb-4">Data Sync</h2>
+
+        <div class="space-y-4">
+          <%= form_with url: admin_sync_index_path, method: :post, class: "space-y-4" do |form| %>
+            <div>
+              <label class="block text-sm font-medium text-neutral-300 mb-2">Sync Type</label>
+              <select name="sync_type" class="w-full px-4 py-3 bg-neutral-800 border border-neutral-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-red-600">
+                <option value="all">Full Sync (Season, Teams, Drivers, Races)</option>
+                <option value="results">Race Results Only</option>
+              </select>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm font-medium text-neutral-300 mb-2">Year</label>
+                <input type="number" name="year" value="<%= Time.current.year %>" class="w-full px-4 py-3 bg-neutral-800 border border-neutral-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-red-600">
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-neutral-300 mb-2">Round (for results)</label>
+                <input type="number" name="round" placeholder="1-24" class="w-full px-4 py-3 bg-neutral-800 border border-neutral-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-red-600">
+              </div>
+            </div>
+
+            <%= form.submit "Start Sync", class: "w-full px-4 py-3 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg transition-colors cursor-pointer" %>
+          <% end %>
+        </div>
+      </div>
+
+      <div class="bg-neutral-900 border border-neutral-800 rounded-xl p-6">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-lg font-semibold text-white">Access Codes</h2>
+          <%= link_to "Manage", admin_invite_codes_path, class: "text-red-500 hover:text-red-400 text-sm" %>
+        </div>
+
+        <%= form_with url: admin_invite_codes_path, method: :post, class: "flex gap-2 mb-4" do %>
+          <input type="text" name="code" placeholder="Custom or blank" class="w-32 px-3 py-2 bg-neutral-800 border border-neutral-700 rounded-lg text-white text-sm placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-red-600 uppercase tracking-wider">
+          <input type="number" name="max_uses" value="1" min="1" class="w-16 px-3 py-2 bg-neutral-800 border border-neutral-700 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-red-600">
+          <button type="submit" class="px-4 py-2 bg-neutral-700 hover:bg-neutral-600 text-white text-sm font-medium rounded-lg transition-colors">
+            Create
+          </button>
+        <% end %>
+
+        <div class="space-y-2">
+          <% @invite_codes.each do |code| %>
+            <div class="flex items-center justify-between p-3 bg-neutral-800/50 rounded-lg">
+              <div>
+                <code class="text-white font-mono tracking-wider"><%= code.code %></code>
+                <p class="text-neutral-500 text-xs mt-1">
+                  <%= code.uses_count %>/<%= code.max_uses %> uses
+                  <% if code.expires_at %>
+                    &bull; Expires <%= code.expires_at.strftime("%b %d") %>
+                  <% end %>
+                </p>
+              </div>
+              <span class="text-xs <%= code.valid_for_use? ? 'text-green-400' : 'text-red-400' %>">
+                <%= code.valid_for_use? ? 'Active' : 'Exhausted' %>
+              </span>
+            </div>
+          <% end %>
+
+          <% if @invite_codes.empty? %>
+            <p class="text-neutral-500 text-sm text-center py-4">No access codes yet</p>
+          <% end %>
+        </div>
+      </div>
+
+      <div class="bg-neutral-900 border border-neutral-800 rounded-xl p-6">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-lg font-semibold text-white">Recent Users</h2>
+          <%= link_to "View All", admin_users_path, class: "text-red-500 hover:text-red-400 text-sm" %>
+        </div>
+
+        <div class="space-y-3">
+          <% @recent_users.each do |user| %>
+            <div class="flex items-center justify-between p-3 bg-neutral-800/50 rounded-lg">
+              <div class="flex items-center gap-3">
+                <div class="w-8 h-8 bg-neutral-700 rounded-full flex items-center justify-center">
+                  <span class="text-white text-sm font-medium"><%= user.name.first.upcase %></span>
+                </div>
+                <div>
+                  <p class="text-white text-sm font-medium">
+                    <%= user.name %>
+                    <% if user.admin? %>
+                      <span class="text-red-400 text-xs ml-1">Admin</span>
+                    <% end %>
+                  </p>
+                  <p class="text-neutral-500 text-xs"><%= user.email_address %></p>
+                </div>
+              </div>
+              <span class="text-neutral-400 text-sm font-mono"><%= user.total_points %> pts</span>
+            </div>
+          <% end %>
+        </div>
+      </div>
+
+      <div class="bg-neutral-900 border border-neutral-800 rounded-xl p-6">
+        <h2 class="text-lg font-semibold text-white mb-4">Quick Actions</h2>
+        <div class="space-y-3">
+          <%= link_to admin_invite_codes_path, class: "flex items-center justify-between p-3 bg-neutral-800/50 hover:bg-neutral-800 rounded-lg transition-colors" do %>
+            <span class="text-white">Manage Access Codes</span>
+            <svg class="w-4 h-4 text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+            </svg>
+          <% end %>
+          <%= link_to admin_users_path, class: "flex items-center justify-between p-3 bg-neutral-800/50 hover:bg-neutral-800 rounded-lg transition-colors" do %>
+            <span class="text-white">Manage Users</span>
+            <svg class="w-4 h-4 text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+            </svg>
+          <% end %>
+          <%= link_to races_path, class: "flex items-center justify-between p-3 bg-neutral-800/50 hover:bg-neutral-800 rounded-lg transition-colors" do %>
+            <span class="text-white">View Races</span>
+            <svg class="w-4 h-4 text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+            </svg>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

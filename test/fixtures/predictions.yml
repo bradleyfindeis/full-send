@@ -1,0 +1,17 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  user: one
+  race: one
+  session_type: MyString
+  position: 1
+  driver: one
+  points_earned: 1
+
+two:
+  user: two
+  race: two
+  session_type: MyString
+  position: 1
+  driver: two
+  points_earned: 1

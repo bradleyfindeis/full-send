@@ -1,0 +1,27 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  external_id: MyString
+  name: MyString
+  round: 1
+  circuit_name: MyString
+  circuit_country: MyString
+  race_date: 2026-03-06 22:10:58
+  quali_date: 2026-03-06 22:10:58
+  sprint_date: 2026-03-06 22:10:58
+  has_sprint: false
+  cancelled: false
+  season: one
+
+two:
+  external_id: MyString
+  name: MyString
+  round: 1
+  circuit_name: MyString
+  circuit_country: MyString
+  race_date: 2026-03-06 22:10:58
+  quali_date: 2026-03-06 22:10:58
+  sprint_date: 2026-03-06 22:10:58
+  has_sprint: false
+  cancelled: false
+  season: two

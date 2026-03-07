@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html class="h-full">
+  <head>
+    <title><%= content_for(:title) || "Full Send" %></title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+
+    <%= yield :head %>
+
+    <link rel="icon" href="/icon.png" type="image/png">
+    <link rel="icon" href="/icon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="/icon.png">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
+    <%= javascript_importmap_tags %>
+
+    <style>
+      :root {
+        --theme-primary: <%= authenticated? ? theme_primary : '#dc2626' %>;
+        --theme-hover: <%= authenticated? ? theme_hover : '#b91c1c' %>;
+        --theme-text: <%= authenticated? ? theme_text : '#ffffff' %>;
+      }
+      .btn-primary {
+        background-color: var(--theme-primary);
+        color: var(--theme-text);
+      }
+      .btn-primary:hover {
+        background-color: var(--theme-hover);
+      }
+      .bg-theme {
+        background-color: var(--theme-primary);
+      }
+      .bg-theme-hover:hover {
+        background-color: var(--theme-hover);
+      }
+      .text-theme {
+        color: var(--theme-primary);
+      }
+      .border-theme {
+        border-color: var(--theme-primary);
+      }
+      .ring-theme {
+        --tw-ring-color: var(--theme-primary);
+      }
+      .bg-theme-20 {
+        background-color: color-mix(in srgb, var(--theme-primary) 20%, transparent);
+      }
+      .text-theme-light {
+        color: color-mix(in srgb, var(--theme-primary) 80%, white);
+      }
+    </style>
+  </head>
+
+  <body class="h-full bg-neutral-950 text-white font-sans antialiased">
+    <% if authenticated? && current_user.onboarding_completed? %>
+      <%= render "shared/navbar" %>
+    <% end %>
+
+    <main class="<%= authenticated? && current_user.onboarding_completed? ? 'pt-32 md:pt-20' : '' %>">
+      <%= yield %>
+    </main>
+  </body>
+</html>

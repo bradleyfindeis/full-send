@@ -1,0 +1,128 @@
+<div class="min-h-screen bg-neutral-950">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="mb-8">
+      <h1 class="text-2xl font-bold text-white">Welcome back, <%= current_user.name.split.first %></h1>
+      <p class="text-neutral-400 mt-1"><%= @season&.year %> Season</p>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div class="lg:col-span-2 space-y-6">
+        <% if @upcoming_race %>
+          <div class="bg-gradient-to-br from-neutral-900 to-neutral-800 border border-neutral-700 rounded-xl p-6">
+            <div class="flex items-center justify-between mb-4">
+              <h2 class="text-lg font-semibold text-white">Next Race</h2>
+              <span class="px-3 py-1 bg-theme-20 text-theme-light text-xs font-medium rounded-full">Round <%= @upcoming_race.round %></span>
+            </div>
+
+            <h3 class="text-2xl font-bold text-white mb-2"><%= @upcoming_race.name %></h3>
+            <p class="text-neutral-400 mb-4">
+              <svg class="inline w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+              </svg>
+              <%= @upcoming_race.circuit_name %>, <%= @upcoming_race.circuit_country %>
+            </p>
+
+            <% if @upcoming_race.next_session %>
+              <div class="bg-neutral-800/50 rounded-lg p-4 mb-4">
+                <p class="text-neutral-400 text-sm mb-1">Next Session: <span class="text-white font-medium capitalize"><%= @upcoming_race.next_session[:type] %></span></p>
+                <p class="text-white font-mono text-lg" data-controller="countdown" data-countdown-target-value="<%= @upcoming_race.next_session[:date].iso8601 %>">
+                  <%= local_time(@upcoming_race.next_session[:date], format: :long) %> <%= timezone_abbrev %>
+                </p>
+              </div>
+            <% end %>
+
+            <div class="flex flex-wrap gap-3">
+              <%= link_to "Make Predictions", new_race_prediction_path(@upcoming_race), class: "inline-flex items-center px-4 py-2 btn-primary font-medium rounded-lg transition-colors" %>
+              <%= link_to "View Details", race_path(@upcoming_race), class: "inline-flex items-center px-4 py-2 bg-neutral-700 hover:bg-neutral-600 text-white font-medium rounded-lg transition-colors" %>
+            </div>
+          </div>
+        <% else %>
+          <div class="bg-neutral-900 border border-neutral-800 rounded-xl p-6 text-center">
+            <p class="text-neutral-400">No upcoming races. Check back soon!</p>
+          </div>
+        <% end %>
+
+        <% if @recent_races.any? %>
+          <div class="bg-neutral-900 border border-neutral-800 rounded-xl p-6">
+            <h2 class="text-lg font-semibold text-white mb-4">Recent Results</h2>
+            <div class="space-y-3">
+              <% @recent_races.each do |race| %>
+                <div class="flex items-center justify-between p-3 bg-neutral-800/50 rounded-lg hover:bg-neutral-800 transition-colors">
+                  <div>
+                    <p class="text-white font-medium">Round <%= race.round %>: <%= race.name %></p>
+                    <p class="text-neutral-400 text-sm"><%= race.race_date&.strftime("%B %d, %Y") %></p>
+                  </div>
+                  <%= link_to "View", race_path(race), class: "text-theme hover:opacity-80 text-sm font-medium" %>
+                </div>
+              <% end %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+
+      <div class="space-y-6">
+        <div class="bg-neutral-900 border border-neutral-800 rounded-xl p-6">
+          <h2 class="text-lg font-semibold text-white mb-4">Your Stats</h2>
+          <div class="space-y-4">
+            <div class="flex justify-between items-center">
+              <span class="text-neutral-400">Total Points</span>
+              <span class="text-2xl font-bold text-white font-mono"><%= current_user.total_points %></span>
+            </div>
+            <div class="flex justify-between items-center">
+              <span class="text-neutral-400">Predictions Made</span>
+              <span class="text-white font-medium"><%= current_user.predictions.count %></span>
+            </div>
+            <div class="flex justify-between items-center">
+              <span class="text-neutral-400">Correct Predictions</span>
+              <span class="text-white font-medium"><%= current_user.predictions.scored.count %></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-neutral-900 border border-neutral-800 rounded-xl p-6">
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="text-lg font-semibold text-white">Leaderboard</h2>
+            <%= link_to "View All", leaderboard_index_path, class: "text-theme hover:opacity-80 text-sm font-medium" %>
+          </div>
+          <div class="space-y-3">
+            <% @leaderboard.each_with_index do |user, index| %>
+              <div class="flex items-center justify-between p-2 rounded-lg <%= user == current_user ? 'bg-theme-20 border border-theme' : '' %>" style="<%= user == current_user ? '--tw-border-opacity: 0.3' : '' %>">
+                <div class="flex items-center space-x-3">
+                  <span class="w-6 h-6 flex items-center justify-center rounded-full <%= index == 0 ? 'bg-yellow-500 text-black' : index == 1 ? 'bg-neutral-400 text-black' : index == 2 ? 'bg-amber-600 text-black' : 'bg-neutral-700 text-white' %> text-xs font-bold">
+                    <%= index + 1 %>
+                  </span>
+                  <span class="text-white text-sm font-medium truncate max-w-[120px]"><%= user.name %></span>
+                </div>
+                <span class="text-white font-mono font-medium"><%= user.total_points %></span>
+              </div>
+            <% end %>
+          </div>
+        </div>
+
+        <% season_prediction = current_user.season_predictions.find_by(season: @season) %>
+        <div class="bg-neutral-900 border border-neutral-800 rounded-xl p-6">
+          <h2 class="text-lg font-semibold text-white mb-4">Season Champions</h2>
+          <% if season_prediction&.complete? %>
+            <div class="space-y-3">
+              <div>
+                <p class="text-neutral-400 text-sm">Drivers Champion</p>
+                <p class="text-white font-medium"><%= season_prediction.drivers_champion&.name || "Not selected" %></p>
+              </div>
+              <div>
+                <p class="text-neutral-400 text-sm">Constructors Champion</p>
+                <p class="text-white font-medium"><%= season_prediction.constructors_champion&.name || "Not selected" %></p>
+              </div>
+              <% if season_prediction.locked? %>
+                <p class="text-neutral-500 text-xs mt-2">Locked on <%= season_prediction.locked_at.strftime("%B %d") %></p>
+              <% end %>
+            </div>
+          <% else %>
+            <p class="text-neutral-400 text-sm mb-4">Lock in your champion predictions to earn up to 100 bonus points!</p>
+            <%= link_to "Make Picks", new_season_prediction_path, class: "inline-flex items-center px-4 py-2 btn-primary text-sm font-medium rounded-lg transition-colors" %>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

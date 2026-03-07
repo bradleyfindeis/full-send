@@ -1,0 +1,199 @@
+<div class="min-h-screen bg-neutral-950">
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="mb-8">
+      <%= link_to race_path(@race), class: "inline-flex items-center text-neutral-400 hover:text-white transition-colors mb-4" do %>
+        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+        </svg>
+        Back to Race
+      <% end %>
+
+      <h1 class="text-2xl font-bold text-white">Make Predictions</h1>
+      <p class="text-neutral-400 mt-1">Round <%= @race.round %>: <%= @race.name %></p>
+    </div>
+
+    <% if flash[:alert] %>
+      <div class="bg-red-900/50 border border-red-500 rounded-lg p-4 mb-6">
+        <p class="text-red-200"><%= flash[:alert] %></p>
+      </div>
+    <% end %>
+
+    <%= form_with url: race_predictions_path(@race), method: :post, class: "space-y-8" do |form| %>
+      <% unless @race.quali_locked? %>
+        <div class="bg-neutral-900 border border-neutral-800 rounded-xl p-6">
+          <div class="flex items-center justify-between mb-6">
+            <div>
+              <h2 class="text-lg font-semibold text-white">Qualifying</h2>
+              <p class="text-neutral-400 text-sm">Predict the top 3 qualifiers</p>
+            </div>
+            <div class="text-right">
+              <p class="text-neutral-400 text-xs">Locks at (<%= timezone_abbrev %>)</p>
+              <p class="text-white text-sm font-mono"><%= local_time(@race.quali_date) || "TBD" %></p>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <% (1..3).each do |position| %>
+              <div>
+                <label class="block text-sm font-medium text-neutral-300 mb-2">
+                  <span class="inline-flex items-center justify-center w-6 h-6 rounded-full <%= position == 1 ? 'bg-yellow-500 text-black' : position == 2 ? 'bg-neutral-400 text-black' : 'bg-amber-600 text-black' %> text-xs font-bold mr-2">P<%= position %></span>
+                  <span class="text-neutral-400"><%= Prediction::POINTS[:qualifying][position] %> pts</span>
+                </label>
+                <%= render "shared/driver_select", 
+                    name: "predictions[qualifying][p#{position}]",
+                    drivers: @drivers,
+                    selected_id: @existing_predictions.dig("qualifying_position_#{position}")&.driver_id %>
+              </div>
+            <% end %>
+          </div>
+        </div>
+      <% else %>
+        <div class="bg-neutral-900/50 border border-neutral-800 rounded-xl p-6">
+          <div class="flex items-center gap-3 text-neutral-500">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+            </svg>
+            <span>Qualifying predictions are locked</span>
+          </div>
+        </div>
+      <% end %>
+
+      <% if @race.has_sprint? %>
+        <% unless @race.sprint_locked? %>
+          <div class="bg-neutral-900 border border-neutral-800 rounded-xl p-6">
+            <div class="flex items-center justify-between mb-6">
+              <div>
+                <h2 class="text-lg font-semibold text-white">Sprint</h2>
+                <p class="text-neutral-400 text-sm">Predict the top 3 sprint finishers</p>
+              </div>
+              <div class="text-right">
+                <p class="text-neutral-400 text-xs">Locks at (<%= timezone_abbrev %>)</p>
+                <p class="text-white text-sm font-mono"><%= local_time(@race.sprint_date) || "TBD" %></p>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <% (1..3).each do |position| %>
+                <div>
+                  <label class="block text-sm font-medium text-neutral-300 mb-2">
+                    <span class="inline-flex items-center justify-center w-6 h-6 rounded-full <%= position == 1 ? 'bg-yellow-500 text-black' : position == 2 ? 'bg-neutral-400 text-black' : 'bg-amber-600 text-black' %> text-xs font-bold mr-2">P<%= position %></span>
+                    <span class="text-neutral-400"><%= Prediction::POINTS[:sprint][position] %> pts</span>
+                  </label>
+                  <%= render "shared/driver_select", 
+                      name: "predictions[sprint][p#{position}]",
+                      drivers: @drivers,
+                      selected_id: @existing_predictions.dig("sprint_position_#{position}")&.driver_id %>
+                </div>
+              <% end %>
+            </div>
+          </div>
+        <% else %>
+          <div class="bg-neutral-900/50 border border-neutral-800 rounded-xl p-6">
+            <div class="flex items-center gap-3 text-neutral-500">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+              </svg>
+              <span>Sprint predictions are locked</span>
+            </div>
+          </div>
+        <% end %>
+      <% end %>
+
+      <% unless @race.race_locked? %>
+        <div class="bg-neutral-900 border border-neutral-800 rounded-xl p-6">
+          <div class="flex items-center justify-between mb-6">
+            <div>
+              <h2 class="text-lg font-semibold text-white">Race</h2>
+              <p class="text-neutral-400 text-sm">Predict the podium and fastest lap</p>
+            </div>
+            <div class="text-right">
+              <p class="text-neutral-400 text-xs">Locks at (<%= timezone_abbrev %>)</p>
+              <p class="text-white text-sm font-mono"><%= local_time(@race.race_date) || "TBD" %></p>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            <% (1..3).each do |position| %>
+              <div>
+                <label class="block text-sm font-medium text-neutral-300 mb-2">
+                  <span class="inline-flex items-center justify-center w-6 h-6 rounded-full <%= position == 1 ? 'bg-yellow-500 text-black' : position == 2 ? 'bg-neutral-400 text-black' : 'bg-amber-600 text-black' %> text-xs font-bold mr-2">P<%= position %></span>
+                  <span class="text-neutral-400"><%= Prediction::POINTS[:race][position] %> pts</span>
+                </label>
+                <%= render "shared/driver_select", 
+                    name: "predictions[race][p#{position}]",
+                    drivers: @drivers,
+                    selected_id: @existing_predictions.dig("race_position_#{position}")&.driver_id %>
+              </div>
+            <% end %>
+          </div>
+
+          <div class="border-t border-neutral-700 pt-6">
+            <label class="block text-sm font-medium text-neutral-300 mb-2">
+              <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-purple-600 text-white text-xs font-bold mr-2">FL</span>
+              Fastest Lap
+              <span class="text-neutral-400 ml-2"><%= Prediction::POINTS[:fastest_lap] %> pts</span>
+            </label>
+            <div class="md:w-1/3">
+              <%= render "shared/driver_select", 
+                  name: "predictions[fastest_lap]",
+                  drivers: @drivers,
+                  selected_id: @existing_predictions.dig("race_fastest_lap_")&.driver_id %>
+            </div>
+          </div>
+        </div>
+      <% else %>
+        <div class="bg-neutral-900/50 border border-neutral-800 rounded-xl p-6">
+          <div class="flex items-center gap-3 text-neutral-500">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+            </svg>
+            <span>Race predictions are locked</span>
+          </div>
+        </div>
+      <% end %>
+
+      <div class="flex justify-end gap-4">
+        <%= link_to "Cancel", race_path(@race), class: "px-6 py-3 bg-neutral-700 hover:bg-neutral-600 text-white font-medium rounded-lg transition-colors" %>
+        <%= form.submit "Save Predictions", class: "px-6 py-3 btn-primary font-semibold rounded-lg transition-colors cursor-pointer" %>
+      </div>
+
+      <div class="bg-neutral-900/50 border border-neutral-800 rounded-xl p-6">
+        <h3 class="text-white font-semibold mb-3">Points System</h3>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+          <div>
+            <p class="text-neutral-400">Qualifying P1</p>
+            <p class="text-white font-mono">10 pts</p>
+          </div>
+          <div>
+            <p class="text-neutral-400">Qualifying P2</p>
+            <p class="text-white font-mono">8 pts</p>
+          </div>
+          <div>
+            <p class="text-neutral-400">Qualifying P3</p>
+            <p class="text-white font-mono">6 pts</p>
+          </div>
+          <div>
+            <p class="text-neutral-400">Race P1</p>
+            <p class="text-white font-mono">15 pts</p>
+          </div>
+          <div>
+            <p class="text-neutral-400">Race P2</p>
+            <p class="text-white font-mono">10 pts</p>
+          </div>
+          <div>
+            <p class="text-neutral-400">Race P3</p>
+            <p class="text-white font-mono">8 pts</p>
+          </div>
+          <div>
+            <p class="text-neutral-400">Fastest Lap</p>
+            <p class="text-white font-mono">5 pts</p>
+          </div>
+          <div>
+            <p class="text-neutral-400">Podium Sweep</p>
+            <p class="text-white font-mono">+10 pts</p>
+          </div>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>

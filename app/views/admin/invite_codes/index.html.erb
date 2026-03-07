@@ -1,0 +1,97 @@
+<div class="min-h-screen bg-neutral-950">
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="mb-8">
+      <%= link_to admin_root_path, class: "inline-flex items-center text-neutral-400 hover:text-white transition-colors mb-4" do %>
+        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+        </svg>
+        Back to Admin
+      <% end %>
+
+      <h1 class="text-2xl font-bold text-white">Access Codes</h1>
+      <p class="text-neutral-400 mt-1">Generate and manage access codes</p>
+    </div>
+
+    <% if flash[:notice] %>
+      <div class="bg-green-900/50 border border-green-500 rounded-lg p-4 mb-6">
+        <p class="text-green-200"><%= flash[:notice] %></p>
+      </div>
+    <% end %>
+
+    <% if flash[:alert] %>
+      <div class="bg-red-900/50 border border-red-500 rounded-lg p-4 mb-6">
+        <p class="text-red-200"><%= flash[:alert] %></p>
+      </div>
+    <% end %>
+
+    <div class="bg-neutral-900 border border-neutral-800 rounded-xl p-6 mb-8">
+      <h2 class="text-lg font-semibold text-white mb-4">Create New Code</h2>
+
+      <%= form_with url: admin_invite_codes_path, method: :post, class: "flex flex-wrap gap-4" do %>
+        <div>
+          <label class="block text-sm font-medium text-neutral-300 mb-2">Code (optional)</label>
+          <input type="text" name="code" placeholder="Auto-generate" class="w-40 px-4 py-3 bg-neutral-800 border border-neutral-700 rounded-lg text-white placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-red-600 uppercase tracking-widest">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-neutral-300 mb-2">Max Uses</label>
+          <input type="number" name="max_uses" value="1" min="1" class="w-24 px-4 py-3 bg-neutral-800 border border-neutral-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-red-600">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-neutral-300 mb-2">Expires At (optional)</label>
+          <input type="datetime-local" name="expires_at" class="px-4 py-3 bg-neutral-800 border border-neutral-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-red-600">
+        </div>
+        <div class="flex items-end">
+          <button type="submit" class="px-6 py-3 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg transition-colors">
+            Create Code
+          </button>
+        </div>
+      <% end %>
+    </div>
+
+    <div class="bg-neutral-900 border border-neutral-800 rounded-xl overflow-hidden">
+      <div class="hidden sm:grid grid-cols-12 gap-4 px-6 py-4 border-b border-neutral-800 text-neutral-400 text-sm font-medium">
+        <div class="col-span-3">Code</div>
+        <div class="col-span-2">Uses</div>
+        <div class="col-span-3">Expires</div>
+        <div class="col-span-2">Status</div>
+        <div class="col-span-2">Actions</div>
+      </div>
+
+      <div class="divide-y divide-neutral-800">
+        <% @invite_codes.each do |code| %>
+          <div class="grid grid-cols-12 gap-4 px-6 py-4 items-center hover:bg-neutral-800/50 transition-colors">
+            <div class="col-span-6 sm:col-span-3">
+              <code class="text-white font-mono tracking-wider text-lg"><%= code.code %></code>
+            </div>
+            <div class="col-span-6 sm:col-span-2">
+              <span class="text-white"><%= code.uses_count %>/<%= code.max_uses %></span>
+            </div>
+            <div class="col-span-6 sm:col-span-3">
+              <span class="text-neutral-400">
+                <% if code.expires_at %>
+                  <%= code.expires_at.strftime("%b %d, %Y %H:%M") %>
+                <% else %>
+                  Never
+                <% end %>
+              </span>
+            </div>
+            <div class="col-span-3 sm:col-span-2">
+              <span class="px-2 py-1 rounded-full text-xs font-medium <%= code.valid_for_use? ? 'bg-green-600/20 text-green-400' : 'bg-red-600/20 text-red-400' %>">
+                <%= code.valid_for_use? ? 'Active' : 'Exhausted' %>
+              </span>
+            </div>
+            <div class="col-span-3 sm:col-span-2">
+              <%= button_to "Delete", admin_invite_code_path(code), method: :delete, class: "text-red-500 hover:text-red-400 text-sm", data: { confirm: "Are you sure?" } %>
+            </div>
+          </div>
+        <% end %>
+
+        <% if @invite_codes.empty? %>
+          <div class="px-6 py-12 text-center">
+            <p class="text-neutral-400">No access codes yet. Create one above!</p>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>

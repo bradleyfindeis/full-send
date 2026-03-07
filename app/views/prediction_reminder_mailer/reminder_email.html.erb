@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      line-height: 1.6;
+      color: #e5e5e5;
+      background-color: #0a0a0a;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 40px 20px;
+    }
+    .card {
+      background-color: #171717;
+      border: 1px solid #262626;
+      border-radius: 12px;
+      padding: 32px;
+    }
+    .logo {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 24px;
+    }
+    .logo-box {
+      width: 32px;
+      height: 32px;
+      background-color: #dc2626;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .logo-text {
+      color: white;
+      font-weight: 900;
+      font-size: 14px;
+      font-style: italic;
+    }
+    .brand-name {
+      color: white;
+      font-weight: 600;
+      font-size: 18px;
+    }
+    h1 {
+      color: white;
+      font-size: 24px;
+      margin: 0 0 16px 0;
+    }
+    .race-info {
+      background-color: #262626;
+      border-radius: 8px;
+      padding: 16px;
+      margin: 24px 0;
+    }
+    .race-name {
+      color: white;
+      font-size: 18px;
+      font-weight: 600;
+      margin: 0 0 8px 0;
+    }
+    .race-details {
+      color: #a3a3a3;
+      font-size: 14px;
+      margin: 0;
+    }
+    .urgency-high {
+      color: #ef4444;
+      font-weight: 600;
+    }
+    .urgency-medium {
+      color: #f59e0b;
+      font-weight: 600;
+    }
+    .cta-button {
+      display: inline-block;
+      background-color: #dc2626;
+      color: white !important;
+      text-decoration: none;
+      padding: 14px 28px;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 16px;
+      margin: 24px 0;
+    }
+    .cta-button:hover {
+      background-color: #b91c1c;
+    }
+    .footer {
+      margin-top: 32px;
+      padding-top: 24px;
+      border-top: 1px solid #262626;
+      color: #737373;
+      font-size: 12px;
+    }
+    .footer a {
+      color: #737373;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+      <div class="logo">
+        <div class="logo-box">
+          <span class="logo-text">FS</span>
+        </div>
+        <span class="brand-name">FULL SEND</span>
+      </div>
+
+      <h1>Hey <%= @user.name.split.first %>,</h1>
+
+      <% case @urgency %>
+      <% when :day_before_quali %>
+        <p>Qualifying for this weekend's race is <strong>tomorrow</strong>! Don't miss your chance to lock in your predictions.</p>
+      <% when :day_of_quali %>
+        <p class="urgency-medium">Qualifying starts <strong>today</strong>! Your qualifying predictions will lock when the session begins.</p>
+      <% when :day_of_race %>
+        <p class="urgency-high">The race is <strong>today</strong>! This is your final chance to make your podium and fastest lap predictions before they lock.</p>
+      <% end %>
+
+      <div class="race-info">
+        <p class="race-name">Round <%= @race.round %>: <%= @race.name %></p>
+        <p class="race-details">
+          <%= @race.circuit_name %>, <%= @race.circuit_country %><br>
+          <% if @urgency == :day_of_race && @race.race_date %>
+            Race starts: <%= format_time_for_user(@race.race_date, @user_timezone) %>
+          <% elsif @race.quali_date %>
+            Qualifying: <%= format_time_for_user(@race.quali_date, @user_timezone) %>
+          <% end %>
+          <% if @race.has_sprint? %>
+            <br><span style="color: #a855f7;">Sprint Weekend</span>
+          <% end %>
+        </p>
+      </div>
+
+      <a href="<%= @predictions_url %>" class="cta-button">Make Your Predictions</a>
+
+      <p style="color: #a3a3a3; font-size: 14px;">
+        Good luck! Remember, every correct prediction earns you points on the leaderboard.
+      </p>
+
+      <div class="footer">
+        <p>You're receiving this email because you have an account on Full Send and haven't made predictions for this race yet.</p>
+        <p style="margin-top: 8px;"><a href="<%= edit_settings_url %>">Manage email preferences</a></p>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

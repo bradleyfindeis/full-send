@@ -1,0 +1,121 @@
+<div class="min-h-screen bg-neutral-950">
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="mb-8">
+      <h1 class="text-2xl font-bold text-white">Leaderboard</h1>
+      <p class="text-neutral-400 mt-1"><%= @season&.year %> Season Standings</p>
+    </div>
+
+    <% if @current_user_rank %>
+      <div class="bg-gradient-to-r to-neutral-900 rounded-xl p-6 mb-8 bg-theme-20 border border-theme" style="--tw-border-opacity: 0.3">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-4">
+            <div class="w-12 h-12 bg-neutral-800 rounded-full flex items-center justify-center">
+              <span class="text-white font-bold"><%= current_user.name.first.upcase %></span>
+            </div>
+            <div>
+              <p class="text-white font-semibold">Your Position</p>
+              <p class="text-neutral-400 text-sm"><%= current_user.name %></p>
+            </div>
+          </div>
+          <div class="text-right">
+            <p class="text-3xl font-bold text-white font-mono">#<%= @current_user_rank %></p>
+            <p class="text-neutral-400 text-sm"><%= current_user.total_points %> points</p>
+          </div>
+        </div>
+      </div>
+    <% end %>
+
+    <div class="bg-neutral-900 border border-neutral-800 rounded-xl overflow-hidden">
+      <div class="hidden sm:grid grid-cols-12 gap-4 px-6 py-4 border-b border-neutral-800 text-neutral-400 text-sm font-medium">
+        <div class="col-span-1">Rank</div>
+        <div class="col-span-7">Player</div>
+        <div class="col-span-2 text-center">Predictions</div>
+        <div class="col-span-2 text-right">Points</div>
+      </div>
+
+      <div class="divide-y divide-neutral-800">
+        <% @users.each_with_index do |user, index| %>
+          <% rank = index + 1 %>
+          <div class="grid grid-cols-12 gap-4 px-6 py-4 items-center <%= user == current_user ? 'bg-theme-20' : 'hover:bg-neutral-800/50' %> transition-colors">
+            <div class="col-span-2 sm:col-span-1">
+              <% if rank <= 3 %>
+                <span class="w-8 h-8 flex items-center justify-center rounded-full <%= rank == 1 ? 'bg-yellow-500 text-black' : rank == 2 ? 'bg-neutral-400 text-black' : 'bg-amber-600 text-black' %> text-sm font-bold">
+                  <%= rank %>
+                </span>
+              <% else %>
+                <span class="w-8 h-8 flex items-center justify-center rounded-full bg-neutral-800 text-white text-sm font-medium">
+                  <%= rank %>
+                </span>
+              <% end %>
+            </div>
+
+            <div class="col-span-7 sm:col-span-7 flex items-center gap-3">
+              <div class="w-10 h-10 bg-neutral-700 rounded-full flex items-center justify-center flex-shrink-0">
+                <span class="text-white font-medium"><%= user.name.first.upcase %></span>
+              </div>
+              <div class="min-w-0">
+                <p class="text-white font-medium truncate">
+                  <%= user.name %>
+                  <% if user == current_user %>
+                    <span class="text-theme-light text-xs ml-1">(You)</span>
+                  <% end %>
+                </p>
+                <% correct_predictions = user.predictions.scored.count %>
+                <% if correct_predictions > 0 %>
+                  <p class="text-neutral-500 text-xs"><%= correct_predictions %> correct</p>
+                <% end %>
+              </div>
+            </div>
+
+            <div class="hidden sm:block col-span-2 text-center">
+              <span class="text-neutral-300 font-mono"><%= user.predictions.count %></span>
+            </div>
+
+            <div class="col-span-3 sm:col-span-2 text-right">
+              <span class="text-xl font-bold text-white font-mono"><%= user.total_points %></span>
+            </div>
+          </div>
+        <% end %>
+
+        <% if @users.empty? %>
+          <div class="px-6 py-12 text-center">
+            <p class="text-neutral-400">No players yet. Be the first to make predictions!</p>
+          </div>
+        <% end %>
+      </div>
+    </div>
+
+    <div class="mt-8 bg-neutral-900 border border-neutral-800 rounded-xl p-6">
+      <h3 class="text-white font-semibold mb-4">How Points Work</h3>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-6 text-sm">
+        <div>
+          <p class="text-neutral-400 mb-2">Per Race Weekend</p>
+          <ul class="space-y-1 text-neutral-300">
+            <li>Qualifying P1-P3: 10/8/6</li>
+            <li>Race P1-P3: 15/10/8</li>
+            <li>Fastest Lap: 5</li>
+            <li>Podium Sweep: +10</li>
+          </ul>
+        </div>
+        <div>
+          <p class="text-neutral-400 mb-2">Sprint Weekends</p>
+          <ul class="space-y-1 text-neutral-300">
+            <li>Sprint P1-P3: 10/7/5</li>
+          </ul>
+        </div>
+        <div>
+          <p class="text-neutral-400 mb-2">Season Champions</p>
+          <ul class="space-y-1 text-neutral-300">
+            <li>Drivers Champion: 50</li>
+            <li>Constructors: 50</li>
+          </ul>
+        </div>
+        <div>
+          <p class="text-neutral-400 mb-2">Max Per Race</p>
+          <p class="text-2xl font-bold text-white font-mono">59<span class="text-neutral-500 text-sm ml-1">pts</span></p>
+          <p class="text-neutral-500 text-xs">(89 with sprint)</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

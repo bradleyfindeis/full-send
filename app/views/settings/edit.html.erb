@@ -1,0 +1,107 @@
+<div class="min-h-screen bg-neutral-950">
+  <div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="mb-8">
+      <h1 class="text-2xl font-bold text-white">Settings</h1>
+      <p class="text-neutral-400 mt-1">Manage your account preferences</p>
+    </div>
+
+    <% if flash[:notice] %>
+      <div class="bg-green-900/50 border border-green-500 rounded-lg p-4 mb-6">
+        <p class="text-green-200"><%= flash[:notice] %></p>
+      </div>
+    <% end %>
+
+    <%= form_with model: @user, url: settings_path, method: :patch, class: "space-y-6" do |form| %>
+      <div class="bg-neutral-900 border border-neutral-800 rounded-xl p-6">
+        <h2 class="text-lg font-semibold text-white mb-4">Livery</h2>
+        
+        <div class="space-y-4">
+          <p class="text-neutral-400 text-sm">Choose a team livery to personalize the app colors.</p>
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-3" data-controller="livery-select">
+            <% ApplicationHelper::THEME_OPTIONS.each do |label, value| %>
+              <% is_selected = @user.theme == value %>
+              <label class="relative cursor-pointer" data-livery-select-target="option" data-selected="<%= is_selected %>">
+                <%= form.radio_button :theme, value, class: "peer sr-only", data: { action: "change->livery-select#select" } %>
+                <div class="livery-card flex items-center gap-2 p-3 rounded-lg border-2 transition-colors <%= is_selected ? 'border-white bg-neutral-700' : 'border-neutral-700 bg-neutral-800 hover:bg-neutral-700' %>">
+                  <div class="w-4 h-4 rounded-full flex-shrink-0" style="background-color: <%= ApplicationHelper::THEME_COLORS[value][:primary] %>"></div>
+                  <span class="text-sm text-white truncate"><%= label %></span>
+                  <svg class="livery-check w-4 h-4 ml-auto text-white flex-shrink-0 <%= is_selected ? '' : 'hidden' %>" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                  </svg>
+                </div>
+              </label>
+            <% end %>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-neutral-900 border border-neutral-800 rounded-xl p-6">
+        <h2 class="text-lg font-semibold text-white mb-4">Time & Date</h2>
+        
+        <div class="space-y-4">
+          <div>
+            <label class="block text-neutral-400 text-sm mb-2">Timezone</label>
+            <p class="text-neutral-500 text-xs mb-2">All race times will be displayed in your selected timezone.</p>
+            <%= form.select :timezone, 
+                ApplicationHelper::TIMEZONE_OPTIONS,
+                {},
+                class: "w-full bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-[var(--theme-primary)] focus:border-transparent" %>
+          </div>
+          
+          <div>
+            <label class="block text-neutral-400 text-sm mb-2">Time Format</label>
+            <div class="flex gap-4">
+              <% ApplicationHelper::TIME_FORMAT_OPTIONS.each do |label, value| %>
+                <label class="flex items-center gap-2 cursor-pointer">
+                  <%= form.radio_button :time_format, value, class: "w-4 h-4 text-red-600 bg-neutral-800 border-neutral-600 focus:ring-red-500" %>
+                  <span class="text-white text-sm"><%= label %></span>
+                </label>
+              <% end %>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-neutral-900 border border-neutral-800 rounded-xl p-6">
+        <h2 class="text-lg font-semibold text-white mb-4">Email Notifications</h2>
+        
+        <div class="space-y-4">
+          <label class="flex items-start gap-4 cursor-pointer">
+            <%= form.check_box :email_reminders, class: "mt-1 w-5 h-5 rounded border-neutral-600 bg-neutral-800 text-red-600 focus:ring-red-500 focus:ring-offset-neutral-900" %>
+            <div>
+              <p class="text-white font-medium">Prediction Reminders</p>
+              <p class="text-neutral-400 text-sm">
+                Receive email reminders when you haven't made predictions for an upcoming race. 
+                We'll send up to 3 reminders: the day before qualifying, the day of qualifying, 
+                and a final reminder on race day. Times in emails will use your selected timezone.
+              </p>
+            </div>
+          </label>
+        </div>
+      </div>
+
+      <div class="bg-neutral-900 border border-neutral-800 rounded-xl p-6">
+        <h2 class="text-lg font-semibold text-white mb-4">Account Information</h2>
+        
+        <div class="space-y-3">
+          <div>
+            <p class="text-neutral-400 text-sm">Name</p>
+            <p class="text-white"><%= @user.name %></p>
+          </div>
+          <div>
+            <p class="text-neutral-400 text-sm">Email</p>
+            <p class="text-white"><%= @user.email_address %></p>
+          </div>
+          <div>
+            <p class="text-neutral-400 text-sm">Member since</p>
+            <p class="text-white"><%= @user.created_at.strftime("%B %d, %Y") %></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex justify-end">
+        <%= form.submit "Save Settings", class: "px-6 py-3 text-white font-semibold rounded-lg transition-colors cursor-pointer", style: "background-color: #{theme_primary}" %>
+      </div>
+    <% end %>
+  </div>
+</div>
