@@ -19,7 +19,7 @@ Rails.application.routes.draw do
     root "dashboard#index"
     resources :invite_codes, only: %i[index create destroy]
     resources :sync, only: :create
-    resources :users, only: %i[index edit update]
+    resources :users, only: %i[index edit update destroy]
   end
 
   get "up" => "rails/health#show", as: :rails_health_check

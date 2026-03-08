@@ -12,11 +12,13 @@ else
   puts "Admin user already exists: #{admin.email_address}"
 end
 
-# Create invite code for friends
-invite_code = InviteCode.find_or_create_by!(code: "FULLSEND2026") do |ic|
-  ic.max_uses = 20
+# Create invite codes for friends
+%w[FULLSEND2026 FULLSEND F1FRIENDS].each do |code|
+  ic = InviteCode.find_or_initialize_by(code: code)
+  ic.max_uses = 100
+  ic.save!
+  puts "Invite code: #{ic.code} (uses: #{ic.uses_count}/#{ic.max_uses})"
 end
-puts "Invite code for friends: #{invite_code.code}"
 
 # Sync F1 data
 puts "Syncing F1 data for #{Time.current.year}..."

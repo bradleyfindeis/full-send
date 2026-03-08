@@ -1,4 +1,4 @@
-class OnboardingController < ApplicationController
+class OnboardingsController < ApplicationController
   def show
     @user = current_user
     redirect_to root_path if @user.onboarding_completed?

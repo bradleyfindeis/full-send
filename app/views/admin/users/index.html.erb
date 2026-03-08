@@ -18,6 +18,12 @@
       </div>
     <% end %>
 
+    <% if flash[:alert] %>
+      <div class="bg-red-900/50 border border-red-500 rounded-lg p-4 mb-6">
+        <p class="text-red-200"><%= flash[:alert] %></p>
+      </div>
+    <% end %>
+
     <div class="bg-neutral-900 border border-neutral-800 rounded-xl overflow-hidden">
       <div class="hidden sm:grid grid-cols-12 gap-4 px-6 py-4 border-b border-neutral-800 text-neutral-400 text-sm font-medium">
         <div class="col-span-1">Rank</div>
@@ -52,8 +58,13 @@
             <div class="col-span-3 sm:col-span-2">
               <span class="text-white font-mono font-medium"><%= user.total_points %></span>
             </div>
-            <div class="col-span-3 sm:col-span-2">
+            <div class="col-span-3 sm:col-span-2 flex items-center gap-3">
               <%= link_to "Edit", edit_admin_user_path(user), class: "text-red-500 hover:text-red-400 text-sm" %>
+              <% unless user == current_user %>
+                <%= button_to "Delete", admin_user_path(user), method: :delete, 
+                    data: { turbo_confirm: "Delete #{user.name}? This will remove all their predictions and cannot be undone." },
+                    class: "text-neutral-500 hover:text-red-400 text-sm" %>
+              <% end %>
             </div>
           </div>
         <% end %>
