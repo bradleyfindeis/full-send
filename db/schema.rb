@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_03_07_150517) do
+ActiveRecord::Schema[8.0].define(version: 2026_03_08_061928) do
   create_table "drivers", force: :cascade do |t|
     t.string "external_id", null: false
     t.string "name", null: false
@@ -81,6 +81,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_03_07_150517) do
     t.datetime "updated_at", null: false
     t.string "circuit_image_url"
     t.datetime "slack_posted_at"
+    t.datetime "last_results_sync_at"
+    t.boolean "results_finalized", default: false, null: false
     t.index ["external_id"], name: "index_races_on_external_id", unique: true
     t.index ["season_id", "round"], name: "index_races_on_season_id_and_round", unique: true
     t.index ["season_id"], name: "index_races_on_season_id"

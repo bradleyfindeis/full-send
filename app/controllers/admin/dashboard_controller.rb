@@ -8,6 +8,11 @@ module Admin
       @invite_codes = InviteCode.order(created_at: :desc).limit(5)
       @recent_users = User.order(created_at: :desc).limit(5)
       @season = Season.current_season
+      @recent_races = Race.joins(:season)
+                          .where(seasons: { year: Time.current.year })
+                          .where("race_date <= ?", Time.current)
+                          .order(race_date: :desc)
+                          .limit(5)
     end
   end
 end

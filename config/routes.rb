@@ -20,6 +20,12 @@ Rails.application.routes.draw do
     resources :invite_codes, only: %i[index create destroy]
     resources :sync, only: :create
     resources :users, only: %i[index edit update destroy]
+    resources :races, only: [] do
+      member do
+        post :sync_results
+        post :finalize_results
+      end
+    end
   end
 
   get "up" => "rails/health#show", as: :rails_health_check

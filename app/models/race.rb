@@ -64,4 +64,18 @@ class Race < ApplicationRecord
     return false unless race_date && race_date <= 24.hours.ago
     race_results.where(session_type: "race").any?
   end
+
+  def needs_results_sync?
+    return false if results_finalized?
+    return false unless race_date && race_date <= Time.current
+    race_date >= 10.hours.ago
+  end
+
+  def has_race_results?
+    race_results.where(session_type: "race").any?
+  end
+
+  def finalize_results!
+    update!(results_finalized: true)
+  end
 end

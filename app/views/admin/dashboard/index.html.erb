@@ -157,5 +157,60 @@
         </div>
       </div>
     </div>
+
+    <div class="mt-6">
+      <div class="bg-neutral-900 border border-neutral-800 rounded-xl p-6">
+        <div class="flex items-center justify-between mb-4">
+          <div>
+            <h2 class="text-lg font-semibold text-white">Recent Race Results</h2>
+            <p class="text-neutral-400 text-sm mt-1">Auto-sync runs hourly for 10 hours after each race</p>
+          </div>
+        </div>
+
+        <% if @recent_races.any? %>
+          <div class="space-y-3">
+            <% @recent_races.each do |race| %>
+              <div class="flex items-center justify-between p-4 bg-neutral-800/50 rounded-lg">
+                <div class="flex-1">
+                  <p class="text-white font-medium"><%= race.display_name %></p>
+                  <p class="text-neutral-500 text-sm">
+                    <%= race.race_date.strftime("%b %d, %Y at %H:%M") %>
+                    <% if race.last_results_sync_at %>
+                      &bull; Last sync: <%= time_ago_in_words(race.last_results_sync_at) %> ago
+                    <% end %>
+                  </p>
+                </div>
+
+                <div class="flex items-center gap-3">
+                  <% if race.results_finalized? %>
+                    <span class="px-3 py-1 bg-green-900/50 text-green-400 text-xs font-medium rounded-full">Finalized</span>
+                  <% elsif race.has_race_results? %>
+                    <span class="px-3 py-1 bg-yellow-900/50 text-yellow-400 text-xs font-medium rounded-full">Has Results</span>
+                  <% elsif race.needs_results_sync? %>
+                    <span class="px-3 py-1 bg-blue-900/50 text-blue-400 text-xs font-medium rounded-full">Auto-syncing</span>
+                  <% else %>
+                    <span class="px-3 py-1 bg-neutral-700 text-neutral-400 text-xs font-medium rounded-full">No Results</span>
+                  <% end %>
+
+                  <div class="flex gap-2">
+                    <%= button_to "Sync", sync_results_admin_race_path(race), 
+                        method: :post,
+                        class: "px-3 py-1.5 bg-neutral-700 hover:bg-neutral-600 text-white text-xs font-medium rounded-lg transition-colors" %>
+                    <% unless race.results_finalized? %>
+                      <%= button_to "Finalize", finalize_results_admin_race_path(race),
+                          method: :post,
+                          data: { turbo_confirm: "Finalize results for #{race.name}? This will stop auto-syncing." },
+                          class: "px-3 py-1.5 bg-green-700 hover:bg-green-600 text-white text-xs font-medium rounded-lg transition-colors" %>
+                    <% end %>
+                  </div>
+                </div>
+              </div>
+            <% end %>
+          </div>
+        <% else %>
+          <p class="text-neutral-500 text-center py-8">No past races yet</p>
+        <% end %>
+      </div>
+    </div>
   </div>
 </div>

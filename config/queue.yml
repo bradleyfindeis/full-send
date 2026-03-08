@@ -9,6 +9,9 @@ default: &default
         post_race_results_to_slack:
           class: PostRaceResultsToSlackJob
           schedule: every hour
+        auto_sync_race_results:
+          class: AutoSyncRaceResultsJob
+          schedule: every hour
   workers:
     - queues: "*"
       threads: 3
