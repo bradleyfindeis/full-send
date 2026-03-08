@@ -7,7 +7,7 @@ class UsersController < ApplicationController
       .group_by(&:race)
       .sort_by { |race, _| -race.round }
 
-    @season_predictions = @user.season_predictions.includes(:driver, :team)
+    @season_predictions = @user.season_predictions.includes(:drivers_champion, :constructors_champion)
     @user_rank = User.where("total_points > ?", @user.total_points).count + 1
   end
 end

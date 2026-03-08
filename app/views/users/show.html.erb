@@ -29,19 +29,26 @@
         <h2 class="text-lg font-semibold text-white mb-4">Season Predictions</h2>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <% @season_predictions.each do |prediction| %>
-            <div class="flex items-center justify-between p-3 bg-neutral-800/50 rounded-lg">
-              <div class="flex items-center gap-3">
-                <span class="px-2 py-1 bg-theme-20 text-theme-light text-xs font-medium rounded">
-                  <%= prediction.prediction_type.titleize %>
-                </span>
-                <span class="text-white">
-                  <%= prediction.driver&.name || prediction.team&.name %>
-                </span>
+            <% if prediction.drivers_champion.present? %>
+              <div class="flex items-center justify-between p-3 bg-neutral-800/50 rounded-lg">
+                <div class="flex items-center gap-3">
+                  <span class="px-2 py-1 bg-theme-20 text-theme-light text-xs font-medium rounded">
+                    Drivers Champion
+                  </span>
+                  <span class="text-white"><%= prediction.drivers_champion.name %></span>
+                </div>
               </div>
-              <% if prediction.points_earned > 0 %>
-                <span class="text-green-400 font-mono font-semibold">+<%= prediction.points_earned %></span>
-              <% end %>
-            </div>
+            <% end %>
+            <% if prediction.constructors_champion.present? %>
+              <div class="flex items-center justify-between p-3 bg-neutral-800/50 rounded-lg">
+                <div class="flex items-center gap-3">
+                  <span class="px-2 py-1 bg-theme-20 text-theme-light text-xs font-medium rounded">
+                    Constructors Champion
+                  </span>
+                  <span class="text-white"><%= prediction.constructors_champion.name %></span>
+                </div>
+              </div>
+            <% end %>
           <% end %>
         </div>
       </div>
