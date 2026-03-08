@@ -14,6 +14,7 @@ Rails.application.routes.draw do
   resource :onboarding, only: %i[show update]
   resources :leaderboard, only: :index
   resources :results, only: %i[index show]
+  resources :users, only: :show
 
   namespace :admin do
     root "dashboard#index"

@@ -36,7 +36,7 @@
       <div class="divide-y divide-neutral-800">
         <% @users.each_with_index do |user, index| %>
           <% rank = index + 1 %>
-          <div class="grid grid-cols-12 gap-4 px-6 py-4 items-center <%= user == current_user ? 'bg-theme-20' : 'hover:bg-neutral-800/50' %> transition-colors">
+          <%= link_to user_path(user), class: "grid grid-cols-12 gap-4 px-6 py-4 items-center #{user == current_user ? 'bg-theme-20' : 'hover:bg-neutral-800/50'} transition-colors" do %>
             <div class="col-span-2 sm:col-span-1">
               <% if rank <= 3 %>
                 <span class="w-8 h-8 flex items-center justify-center rounded-full <%= rank == 1 ? 'bg-yellow-500 text-black' : rank == 2 ? 'bg-neutral-400 text-black' : 'bg-amber-600 text-black' %> text-sm font-bold">
@@ -74,7 +74,7 @@
             <div class="col-span-3 sm:col-span-2 text-right">
               <span class="text-xl font-bold text-white font-mono"><%= user.total_points %></span>
             </div>
-          </div>
+          <% end %>
         <% end %>
 
         <% if @users.empty? %>
